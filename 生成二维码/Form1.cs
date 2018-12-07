@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using ZXing;
 using ZXing.Common;
-using ZXing.QrCode;
 using ZXing.QrCode.Internal;
 
 namespace 生成二维码
@@ -39,7 +35,7 @@ namespace 生成二维码
                 barCodeWriter.Options.Height = height;
                 barCodeWriter.Options.Width = width;
                 barCodeWriter.Options.Margin = 0;
-                ZXing.Common.BitMatrix bm = barCodeWriter.Encode(strMessage);
+                BitMatrix bm = barCodeWriter.Encode(strMessage);
                 result = barCodeWriter.Write(bm);
             }
             catch { }
