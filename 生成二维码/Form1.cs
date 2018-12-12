@@ -101,7 +101,7 @@ namespace 生成二维码
                     qrCode = GetQRCodeByZXingNet(textBox1.Text.TrimEnd(new char[] { '/' }) + "/" + i + comboBox1.Text, pictureBox1.Image, Convert.ToInt32(textBox2.Text), Convert.ToInt32(textBox2.Text));
                 else
                     qrCode = GetQRCodeByZXingNet(textBox1.Text.TrimEnd(new char[] { '/' }) + "/" + i + comboBox1.Text, Convert.ToInt32(textBox2.Text), Convert.ToInt32(textBox2.Text));
-                qrCode.Save("Image\\"+i + ".eps", ImageFormat.Tiff);
+                qrCode.Save("Image\\"+i + ".png", ImageFormat.Png);
             }
             MessageBox.Show("生成成功！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
