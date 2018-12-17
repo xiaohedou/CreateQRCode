@@ -97,38 +97,45 @@ namespace 生成二维码
             return bmpimg;
         }
 
+        string path = "";
         //生成二维码
         private void button1_Click(object sender, EventArgs e)
         {
-            Bitmap qrCode;
-            if (tabControl1.SelectedIndex == 0)
+            FolderBrowserDialog floder = new FolderBrowserDialog();
+            if (floder.ShowDialog() == DialogResult.OK)
             {
-                if (dataGridView1.Rows.Count > 0)
+                path = floder.SelectedPath.TrimEnd(new char[] { '\\' }) + "\\";
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+                Bitmap qrCode;
+                if (tabControl1.SelectedIndex == 0)
                 {
-                    for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                    if (dataGridView1.Rows.Count > 0)
                     {
-                        
-                        string strName = dataGridView1.Rows[i].Cells[Convert.ToInt32(textBox7.Text.Trim())-1].Value.ToString();
-                        if (checkBox1.Checked)
-                            qrCode = GetQRCodeByZXingNet(strName, pictureBox1.Image, Convert.ToInt32(textBox2.Text), Convert.ToInt32(textBox2.Text));
-                        else
-                            qrCode = GetQRCodeByZXingNet(strName, Convert.ToInt32(textBox2.Text), Convert.ToInt32(textBox2.Text));
-                        qrCode.Save("Image\\" + strName.Substring(strName.LastIndexOf('/') + 1, strName.LastIndexOf('.') - strName.LastIndexOf('/') - 1) + ".png", ImageFormat.Png);
+                        for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                        {
+                            string strName = dataGridView1.Rows[i].Cells[Convert.ToInt32(textBox7.Text.Trim()) - 1].Value.ToString();
+                            if (checkBox1.Checked)
+                                qrCode = GetQRCodeByZXingNet(strName, pictureBox1.Image, Convert.ToInt32(textBox2.Text), Convert.ToInt32(textBox2.Text));
+                            else
+                                qrCode = GetQRCodeByZXingNet(strName, Convert.ToInt32(textBox2.Text), Convert.ToInt32(textBox2.Text));
+                            qrCode.Save(path + strName.Substring(strName.LastIndexOf('/') + 1, strName.LastIndexOf('.') - strName.LastIndexOf('/') - 1) + ".png", ImageFormat.Png);
+                        }
                     }
                 }
-            }
-            else if (tabControl1.SelectedIndex == 1)
-            {
-                for (int i = Convert.ToInt32(textBox4.Text.Trim()); i <= Convert.ToInt32(textBox5.Text.Trim()); i++)
+                else if (tabControl1.SelectedIndex == 1)
                 {
-                    if (checkBox1.Checked)
-                        qrCode = GetQRCodeByZXingNet(textBox1.Text.TrimEnd(new char[] { '/' }) + "/" + i + comboBox1.Text, pictureBox1.Image, Convert.ToInt32(textBox2.Text), Convert.ToInt32(textBox2.Text));
-                    else
-                        qrCode = GetQRCodeByZXingNet(textBox1.Text.TrimEnd(new char[] { '/' }) + "/" + i + comboBox1.Text, Convert.ToInt32(textBox2.Text), Convert.ToInt32(textBox2.Text));
-                    qrCode.Save("Image\\" + i + ".png", ImageFormat.Png);
+                    for (int i = Convert.ToInt32(textBox4.Text.Trim()); i <= Convert.ToInt32(textBox5.Text.Trim()); i++)
+                    {
+                        if (checkBox1.Checked)
+                            qrCode = GetQRCodeByZXingNet(textBox1.Text.TrimEnd(new char[] { '/' }) + "/" + i + comboBox1.Text, pictureBox1.Image, Convert.ToInt32(textBox2.Text), Convert.ToInt32(textBox2.Text));
+                        else
+                            qrCode = GetQRCodeByZXingNet(textBox1.Text.TrimEnd(new char[] { '/' }) + "/" + i + comboBox1.Text, Convert.ToInt32(textBox2.Text), Convert.ToInt32(textBox2.Text));
+                        qrCode.Save(path + i + ".png", ImageFormat.Png);
+                    }
                 }
+                MessageBox.Show("生成成功！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            MessageBox.Show("生成成功！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         //选择是否包含图片
@@ -158,7 +165,7 @@ namespace 生成二维码
 
         private void button3_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start("explorer.exe", Application.StartupPath + "\\Image\\");
+            System.Diagnostics.Process.Start("explorer.exe", path);
         }
 
         OleDbConnection olecon;
