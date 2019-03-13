@@ -7,7 +7,7 @@
     <ProjectGuid>{F9F55D95-1903-4A29-8922-CB7A2B0FE32B}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>生成二维码</RootNamespace>
-    <AssemblyName>批量生成二维码</AssemblyName>
+    <AssemblyName>二维码生成及验证工具</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

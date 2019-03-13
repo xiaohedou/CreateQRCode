@@ -20,6 +20,33 @@ namespace 生成二维码
         {
             InitializeComponent();
         }
+
+        //设置二维码颜色
+        Color setGolor()
+        {
+            Color color;
+            switch (comboBox3.SelectedIndex)
+            {
+                case 0:
+                default:
+                    color = Color.Red;
+                    break;
+                case 1:
+                    color = Color.FromArgb(51, 128, 47);
+                    break;
+                case 2:
+                    color = Color.Blue;
+                    break;
+                case 3:
+                    color = Color.Purple;
+                    break;
+                case 4:
+                    color = Color.Black;
+                    break;
+            }
+            return color;
+        }
+
         /// <summary>
         /// 生成二维码图片
         /// </summary>
@@ -33,9 +60,11 @@ namespace 生成二维码
             try
             {
                 BarcodeWriter barCodeWriter = new BarcodeWriter();
+                //设置生成彩色二维码
+                barCodeWriter.Renderer = new ZXing.Rendering.BitmapRenderer { Background = Color.White, Foreground = setGolor() };
                 barCodeWriter.Format = BarcodeFormat.QR_CODE;
                 barCodeWriter.Options.Hints.Add(EncodeHintType.CHARACTER_SET, "UTF-8");
-                barCodeWriter.Options.Hints.Add(EncodeHintType.ERROR_CORRECTION, ZXing.QrCode.Internal.ErrorCorrectionLevel.H);
+                barCodeWriter.Options.Hints.Add(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
                 barCodeWriter.Options.Height = height;
                 barCodeWriter.Options.Width = width;
                 barCodeWriter.Options.Margin = 0;
@@ -62,7 +91,7 @@ namespace 生成二维码
             }
             if (middleImg == null)
             {
-                return GetQRCodeByZXingNet(contents,width,height);
+                return GetQRCodeByZXingNet(contents, width, height);
             }
             //构造二维码写码器
             MultiFormatWriter mutiWriter = new MultiFormatWriter();
@@ -72,6 +101,8 @@ namespace 生成二维码
             //生成二维码
             BitMatrix bm = mutiWriter.encode(contents, BarcodeFormat.QR_CODE, width, height, hint);
             BarcodeWriter barcodeWriter = new BarcodeWriter();
+            //设置生成彩色二维码
+            barcodeWriter.Renderer = new ZXing.Rendering.BitmapRenderer { Background = Color.White, Foreground = setGolor() };
             Bitmap bitmap = barcodeWriter.Write(bm);
             //获取二维码实际尺寸（去掉二维码两边空白后的实际尺寸）
             int[] rectangle = bm.getEnclosingRectangle();
@@ -81,7 +112,7 @@ namespace 生成二维码
             int middleImgL = (bitmap.Width - middleImgW) / 2;
             int middleImgT = (bitmap.Height - middleImgH) / 2;
             //将img转换成bmp格式，否则后面无法创建 Graphics对象
-            Bitmap bmpimg = new Bitmap(bitmap.Width, bitmap.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Bitmap bmpimg = new Bitmap(bitmap.Width, bitmap.Height, PixelFormat.Format32bppArgb);
             using (Graphics g = Graphics.FromImage(bmpimg))
             {
                 g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
@@ -134,6 +165,18 @@ namespace 生成二维码
                         qrCode.Save(path + i + ".png", ImageFormat.Png);
                     }
                 }
+                if (checkBox2.Checked)
+                {
+                    if (textBox8.Text != string.Empty)
+                    {
+                        string[] files = Directory.GetFiles(path);
+                        for (int i = 0; i < files.Length; i++)
+                        {
+                            CombinImage(textBox8.Text, files[i], path + Path.GetFileNameWithoutExtension(textBox8.Text) + "_" + Path.GetFileNameWithoutExtension(files[i]) + ".png");
+                            File.Delete(files[i]);
+                        }
+                    }
+                }
                 MessageBox.Show("生成成功！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
@@ -152,7 +195,7 @@ namespace 生成二维码
         {
             OpenFileDialog openFile = new OpenFileDialog();
             openFile.Filter = "图片文件|*.jpg;*.jpeg;*.png;*.bmp";
-            if(openFile.ShowDialog()==DialogResult.OK)
+            if (openFile.ShowDialog() == DialogResult.OK)
             {
                 pictureBox1.Image = Image.FromFile(openFile.FileName);
             }
@@ -160,7 +203,7 @@ namespace 生成二维码
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            comboBox1.SelectedIndex = 0;
+            comboBox1.SelectedIndex = comboBox2.SelectedIndex = comboBox3.SelectedIndex = 0;
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -269,17 +312,18 @@ namespace 生成二维码
             }
         }
 
+        //切换二维码生成方式
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (tabControl1.SelectedIndex == 0)
             {
                 dataGridView1.Visible = true;
-                this.Height = 670;
+                this.Height = 720;
             }
             else if (tabControl1.SelectedIndex == 1)
             {
                 dataGridView1.Visible = false;
-                this.Height = 345;
+                this.Height = 390;
             }
         }
 
@@ -300,6 +344,59 @@ namespace 生成二维码
         private void 使用说明ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             System.Diagnostics.Process.Start("使用说明.txt");
+        }
+
+        //是否设置背景图
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox2.Checked)
+                label12.Visible = textBox8.Visible = button5.Visible = groupBox3.Visible = true;
+            else
+                label12.Visible = textBox8.Visible = button5.Visible = groupBox3.Visible = false;
+        }
+
+        //选择背景图
+        private void button5_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog selectFile = new OpenFileDialog();
+            selectFile.Filter = "图片文件(*.png;*.jpg;*.jpeg;*.bmp;*.svg)|*.png;*.jpg;*.jpeg;*.bmp;*.svg";
+            if (selectFile.ShowDialog() == DialogResult.OK)
+            {
+                textBox8.Text = selectFile.FileName;//在文本框中显示图片文件名
+            }
+        }
+
+        /// <summary>
+        /// 合成图片
+        /// </summary>
+        /// <param name="sourceImg">粘贴的源图片</param>
+        /// <param name="destImg">粘贴的目标图片</param>
+        public void CombinImage(string sourceImg, string destImg, string newImg)
+        {
+            Image imgBack = Image.FromFile(sourceImg);//相框图片 
+            Image img = Image.FromFile(destImg);//照片图片
+            //从指定的Image创建新的Graphics绘图对象
+            Graphics g = Graphics.FromImage(imgBack);
+            //g.DrawImage(img, 照片与相框的左边距, 照片与相框的上边距, 层叠图片宽, 层叠图片高);
+            switch (comboBox2.SelectedIndex)
+            {
+                case 0:
+                default:
+                    g.DrawImage(img, imgBack.Width - img.Width, imgBack.Height - img.Height, img.Width, img.Height);
+                    break;
+                case 1:
+                    g.DrawImage(img, 0, imgBack.Height - img.Height, img.Width, img.Height);
+                    break;
+                case 2:
+                    g.DrawImage(img, imgBack.Width - img.Width, 0, img.Width, img.Height);
+                    break;
+                case 3:
+                    g.DrawImage(img, 0, 0, img.Width, img.Height);
+                    break;
+            }
+            GC.Collect();
+            img.Dispose();
+            imgBack.Save(newImg, ImageFormat.Png);
         }
     }
 }
